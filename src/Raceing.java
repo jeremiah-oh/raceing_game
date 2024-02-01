@@ -5,15 +5,6 @@ import java.util.Random;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-import javax.swing.AbstractAction;
-import javax.swing.JComboBox;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import javax.imageio.ImageIO;
@@ -22,10 +13,6 @@ import java.io.File;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 
@@ -80,24 +67,24 @@ public class Raceing extends JFrame {
         public static JButton exitBut;
 
         public StartScreen(ActionListener startListener, ActionListener exitListener) {
-            setBackground(Color.PINK);
+            setBackground(GREENLIGHT);
             setLayout(new GridBagLayout());
 
             JLabel title = new JLabel("raceing game", JLabel.CENTER);
             title.setFont(new Font("SansSerif Plain", Font.BOLD, 48));
             title.setForeground(Color.WHITE);
 
-            startBut = new JButton("       start       ");
-            exitBut = new JButton("       exit       ");
+            startBut = new JButton("         start         ");
+            exitBut = new JButton("         exit         ");
 
-            startBut.setFont(new Font("SansSerif Plain", Font.PLAIN, 25));
-            exitBut.setFont(new Font("SansSerif Plain", Font.PLAIN, 25));
-            startBut.setForeground(Color.RED);
-            exitBut.setForeground(Color.RED);
+            startBut.setFont(new Font("SansSerif Plain", Font.PLAIN, 22));
+            exitBut.setFont(new Font("SansSerif Plain", Font.PLAIN, 22));
+            startBut.setForeground(SEASHELL);
+            exitBut.setForeground(SEASHELL);
             startBut.setFocusPainted(false);
             exitBut.setFocusPainted(false);
-            startBut.setBackground(Color.LIGHT_GRAY);
-            exitBut.setBackground(Color.LIGHT_GRAY);
+            startBut.setBackground(SAGE_GREEN);
+            exitBut.setBackground(SAGE_GREEN);
 
             StartGame startGameListener = new StartGame(gamePanel);
             QuitGame quitGameListener = new QuitGame();
@@ -106,7 +93,7 @@ public class Raceing extends JFrame {
             exitBut.addActionListener(quitGameListener);
 
             JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 0, 10));
-            buttonPanel.setBackground(Color.PINK);
+            buttonPanel.setBackground(GREENLIGHT);
             buttonPanel.add(startBut);
             buttonPanel.add(exitBut);
 
@@ -115,7 +102,7 @@ public class Raceing extends JFrame {
             titleGbc.gridy = 0;
             titleGbc.weightx = 1.0;
             titleGbc.weighty = 1.0;
-            titleGbc.insets = new Insets(0, 0, 320, 0);
+            titleGbc.insets = new Insets(0, 0, 300, 0);
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -463,4 +450,8 @@ public class Raceing extends JFrame {
 
     private static JFrame appFrame;
     private static MyPanel gamePanel;
+
+    private static Color SAGE_GREEN = new Color(100,170,140);
+    private static Color GREENLIGHT = new Color(46,139,87);
+    private static Color SEASHELL = new Color(255,245,238);
 }
