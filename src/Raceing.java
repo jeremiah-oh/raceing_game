@@ -295,7 +295,7 @@ public class Raceing extends JFrame {
         public PlayerMover(MyPanel panel) {
             this.panel = panel;
             velocityStep = 1.0;
-            rotateStep = 0.03;
+            rotateStep = 0.0315;
             rotationAngle = 0.0;
             p1velocity = 0.0;
             accelerating = false;
@@ -347,8 +347,8 @@ public class Raceing extends JFrame {
         private double rotateStep;
         private double rotationAngle;
         private final MyPanel panel;
-        private static final double maxSpeed = 2.5;
-        private static final double accel = 0.026;
+        private static final double maxSpeed = 3.25;
+        private static final double accel = 0.0725;
         private static final double decel = 0.5;
         //private double currentSpeed = 0.0;
         private boolean accelerating = false;
