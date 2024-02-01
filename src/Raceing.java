@@ -31,8 +31,6 @@ public class Raceing extends JFrame {
 
     public static void setup() {
         appFrame = new JFrame("Raceing");
-        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        appFrame.setResizable(false);
 
         //declaring variable values
         XOFFSET = 0;
@@ -133,10 +131,11 @@ public class Raceing extends JFrame {
         private Image carModel2;
         private double player1X;
         private double player1Y;
+        private double playerRotation;
         private double player2X;
         private double player2Y;
-        private double playerRotation;
-
+        private double player2Rotation;
+        
         public MyPanel() {
             twisty_turn = new ImageIcon("twist_and_turn.png").getImage();
             carModel = loadAndResizeImage("car1.png", 70, 100);
@@ -147,6 +146,7 @@ public class Raceing extends JFrame {
             player2X = p2originalX;
             player2Y = p2originalY;
             playerRotation = 0.0;
+            player2Rotation = 0.0;
 
             setPreferredSize(new Dimension(WINWIDTH, WINHEIGHT));
 
@@ -188,7 +188,12 @@ public class Raceing extends JFrame {
                 g2d.setTransform(rotationTransform);
 
                 g2d.drawImage(carModel, (int) player1X, (int) player1Y, null);
-                g2d.drawImage(carModel2, (int) player1X, (int) player1Y + 50, null);
+
+                AffineTransform rotationTransform2 = AffineTransform.getRotateInstance(player2Rotation,
+                    player2X + carModel2.getWidth(null) / 2, player2Y + carModel2.getHeight(null) / 2);
+                g2d.setTransform(rotationTransform2);
+
+                g2d.drawImage(carModel2, (int) player2X, (int) player2Y, null);
             }
         }
 
@@ -200,6 +205,12 @@ public class Raceing extends JFrame {
         public void setPlayerPosition(double x, double y) {
             player1X = x;
             player1Y = y;
+            repaint();
+        }
+
+        public void setPlayer2Position(double x, double y) {
+            player2X = x;
+            player2Y = y;
             repaint();
         }
 
@@ -231,23 +242,28 @@ public class Raceing extends JFrame {
                 case KeyEvent.VK_RIGHT:
                     pRight = pressed;
                     break;
-                case KeyEvent.VK_A:
-                    pA = pressed;
-                    break;
                 case KeyEvent.VK_W:
                     pW = pressed;
                     break;
-                case KeyEvent.VK_D:
-                    pD = pressed;
+                case KeyEvent.VK_A:
+                    pA = pressed;
                     break;
                 case KeyEvent.VK_S:
                     pS = pressed;
+                    break;
+                case KeyEvent.VK_D:
+                    pD = pressed;
                     break;
             }
         }
 
         public void setPlayerRotation(double angle) {
             playerRotation = angle;
+            repaint();
+        }
+
+        public void setPlayer2Rotation(double angle) {
+            player2Rotation = angle;
             repaint();
         }
     }
@@ -311,14 +327,14 @@ public class Raceing extends JFrame {
                 if (pUp) {
                     accelerating = true;
                     p1velocity = Math.min(p1velocity + accel, maxSpeed);
-                    moveInDirection(rotationAngle);
+                    moveInDirection(rotationAngle, false);
                 }
                 else {
                     accelerating = false;
                     p1velocity = Math.max(p1velocity - decel, 0.0);
                 }
                 if (pDown) {
-                    moveInDirection(rotationAngle + pi);
+                    moveInDirection(rotationAngle + pi, false);
                     p1velocity = Math.max(p1velocity - decel, 0.0);
                 }
                 if (pLeft) {
@@ -331,16 +347,49 @@ public class Raceing extends JFrame {
                     rotationAngle += rotateStep;
                     panel.setPlayerRotation(rotationAngle);
                 }
+
+                //player 2 movement
+                if (pW) {
+                    accelerating = true;
+                    moveInDirection(rotationAngle, true);
+                    p2velocity = Math.min(p2velocity + accel, maxSpeed);
+                } else {
+                    accelerating = false;
+                    p2velocity = Math.max(p2velocity - decel, 0.0);
+                }
+                if (pS) {
+                    moveInDirection(rotationAngle + pi, true);
+                    p2velocity = Math.max(p2velocity - decel, 0.0);
+                }
+                if (pA) {
+                    accelerating = false;
+                    rotationAngle -= rotateStep;
+                    panel.setPlayer2Rotation(rotationAngle);
+                }
+                if (pD) {
+                    accelerating = false;
+                    rotationAngle += rotateStep;
+                    panel.setPlayer2Rotation(rotationAngle);
+                }
             }
         }
 
         //method to send car in direction its pointing
-        private void moveInDirection(double angle) {
+        private void moveInDirection(double angle, boolean isPlayer2) {
             double adjustedAngle = angle - (Math.PI / 2.0);
+            double velocity = isPlayer2 ? p2velocity : p1velocity;
 
-            double newX = panel.player1X + p1velocity * Math.cos(adjustedAngle);
-            double newY = panel.player1Y + p1velocity * Math.sin(adjustedAngle);
-            panel.setPlayerPosition(newX, newY);
+            double newX = isPlayer2 ? panel.player2X : panel.player1X;
+            double newY = isPlayer2 ? panel.player2Y : panel.player1Y;
+
+            newX += velocity * Math.cos(adjustedAngle);
+            newY += velocity * Math.sin(adjustedAngle);
+
+            if (isPlayer2) {
+                panel.setPlayer2Position(newX, newY);
+            } else {
+                panel.setPlayerPosition(newX, newY);
+            }
         }
 
         private double velocityStep;
@@ -428,6 +477,8 @@ public class Raceing extends JFrame {
 
     public static void main(String[] args) {
         setup();
+        appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        appFrame.setResizable(false);
     }
 
     ///////////////////////////////////////////////////////////////
