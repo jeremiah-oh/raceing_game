@@ -34,17 +34,19 @@ public class Raceing extends JFrame {
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         appFrame.setResizable(false);
 
+        //declaring variable values
         XOFFSET = 0;
         YOFFSET = 40;
         WINWIDTH = 1000;
         WINHEIGHT = 800;
         pi = 3.14159265358979;
         endgame = false;
+        //player 1 values
         p1width = 25;
         p1height = 25;
         p1originalX = (double)XOFFSET + ((double)WINWIDTH /  2.0) - (p1width / 2.0);
         p1originalY = (double)YOFFSET + ((double)WINHEIGHT / 2.0) - (p1height / 2.0);
-
+        //player 2 values
         p2width = 25;
         p2height = 25;
         p2originalX = (double)XOFFSET + ((double)WINWIDTH /  2.0) - (p2width / 2.0);
@@ -52,6 +54,7 @@ public class Raceing extends JFrame {
 
         gamePanel = new MyPanel();
 
+        //init start screen and music
         startScreen = new StartScreen(new StartGame(gamePanel), new QuitGame());
         MusicPlayer musicPlayer = new MusicPlayer("nooks_cranny.wav");
         musicPlayer.start();
@@ -70,6 +73,7 @@ public class Raceing extends JFrame {
             setBackground(GREENLIGHT);
             setLayout(new GridBagLayout());
 
+            //init and styling for title and buttons
             JLabel title = new JLabel("raceing game", JLabel.CENTER);
             title.setFont(new Font("SansSerif Plain", Font.BOLD, 48));
             title.setForeground(Color.WHITE);
@@ -79,19 +83,24 @@ public class Raceing extends JFrame {
 
             startBut.setFont(new Font("SansSerif Plain", Font.PLAIN, 22));
             exitBut.setFont(new Font("SansSerif Plain", Font.PLAIN, 22));
+
             startBut.setForeground(SEASHELL);
             exitBut.setForeground(SEASHELL);
+
             startBut.setFocusPainted(false);
             exitBut.setFocusPainted(false);
+
             startBut.setBackground(SAGE_GREEN);
             exitBut.setBackground(SAGE_GREEN);
 
+            //listening for when startgame button is pressed
             StartGame startGameListener = new StartGame(gamePanel);
             QuitGame quitGameListener = new QuitGame();
 
             startBut.addActionListener(startGameListener);
             exitBut.addActionListener(quitGameListener);
 
+            //layout/coords for buttons
             JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 0, 10));
             buttonPanel.setBackground(GREENLIGHT);
             buttonPanel.add(startBut);
@@ -104,6 +113,7 @@ public class Raceing extends JFrame {
             titleGbc.weighty = 1.0;
             titleGbc.insets = new Insets(0, 0, 300, 0);
 
+            //constraints for buttons
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
@@ -118,7 +128,6 @@ public class Raceing extends JFrame {
 
     private static class MyPanel extends JPanel implements KeyListener {
         private boolean startRace = false;
-
         private Image twisty_turn;
         private Image carModel;
         private Image carModel2;
@@ -132,6 +141,7 @@ public class Raceing extends JFrame {
             twisty_turn = new ImageIcon("twist_and_turn.png").getImage();
             carModel = loadAndResizeImage("car1.png", 70, 100);
             carModel2 = loadAndResizeImage("car2.png", 70, 100);
+
             player1X = p1originalX;
             player1Y = p1originalY;
             player2X = p2originalX;
@@ -146,6 +156,7 @@ public class Raceing extends JFrame {
             pW = false;
         }
 
+        //method for resizing car model
         private Image loadAndResizeImage(String filePath, int width, int height) {
             try {
                 BufferedImage originalImage = ImageIO.read(new File(filePath));
@@ -160,6 +171,7 @@ public class Raceing extends JFrame {
             }
         }
 
+        //drawing everything onto the main screen
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -254,6 +266,7 @@ public class Raceing extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             appFrame.remove(startScreen);
+
             appFrame.add(gamePanel);
             appFrame.revalidate();
             appFrame.repaint();
@@ -321,6 +334,7 @@ public class Raceing extends JFrame {
             }
         }
 
+        //method to send car in direction its pointing
         private void moveInDirection(double angle) {
             double adjustedAngle = angle - (Math.PI / 2.0);
 
