@@ -34,7 +34,7 @@ public class Raceing extends JFrame {
 
         //declaring variable values
         XOFFSET = 0;
-        YOFFSET = 40;
+        YOFFSET = -15;
         WINWIDTH = 1000;
         WINHEIGHT = 800;
         pi = 3.14159265358979;
@@ -220,12 +220,18 @@ public class Raceing extends JFrame {
         }
 
         public void setPlayerPosition(double x, double y) {
+            x = Math.max(XOFFSET, Math.min(x, XOFFSET + WINWIDTH - 70));
+            y = Math.max(YOFFSET, Math.min(y, YOFFSET + WINHEIGHT - 100));
+
             player1X = x;
             player1Y = y;
             repaint();
         }
 
         public void setPlayer2Position(double x, double y) {
+            x = Math.max(XOFFSET, Math.min(x, XOFFSET + WINWIDTH - 70));
+            y = Math.max(YOFFSET, Math.min(y, YOFFSET + WINHEIGHT - 100));
+
             player2X = x;
             player2Y = y;
             repaint();
@@ -405,6 +411,9 @@ public class Raceing extends JFrame {
 
             newX += velocity * Math.cos(adjustedAngle);
             newY += velocity * Math.sin(adjustedAngle);
+
+            newX = Math.max(XOFFSET, Math.min(newX, XOFFSET + WINWIDTH - 70));
+            newY = Math.max(YOFFSET, Math.min(newY, YOFFSET + WINHEIGHT - 100));
 
             if (isPlayer2) {
                 panel.setPlayer2Position(newX, newY);
