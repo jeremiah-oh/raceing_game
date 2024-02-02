@@ -334,7 +334,7 @@ public class Raceing extends JFrame {
         public PlayerMover(MyPanel panel) {
             this.panel = panel;
             velocityStep = 1.0;
-            rotateStep = 0.045;
+            rotateStep = 0.045; 
             rotationAngle = 0.0;
             rotationAngle2 = 0.0;
             p1velocity = 0.0;
@@ -350,17 +350,31 @@ public class Raceing extends JFrame {
                 }
                 //player 1 movement
                 if (pUp) {
-                    accelerating = true;
+                    isAccel = true;
+                    isDecel = false;
+                    // accelerating = true;
+                    // p1velocity = Math.min(p1velocity + accel, maxSpeed);
+                    // moveInDirection(rotationAngle, false);
+                } else if (isAccel) {
+                    isAccel = false;
+                    isDecel = true;
+                    // accelerating = false;
+                    // p1velocity = Math.max(p1velocity - decel, 0.0);
+                }
+                if (isAccel) {
                     p1velocity = Math.min(p1velocity + accel, maxSpeed);
                     moveInDirection(rotationAngle, false);
                 }
-                else {
-                    accelerating = false;
-                    p1velocity = Math.max(p1velocity - decel, 0.0);
+                if (isDecel) {
+                    p1velocity = Math.max(p1velocity - deceleration, 0.0);
+                    moveInDirection(rotationAngle, false);
+
+                    if (p1velocity == 0.0) {
+                        isDecel = false;
+                    }
                 }
                 if (pDown) {
-                    double revDecel = -0.4;
-                    p1velocity = Math.max(p1velocity - revDecel, 0.0);
+                    p1velocity = Math.max(p1velocity - decel, 0.0);
                     moveInDirection(rotationAngle + pi, false);
                 }
                 if (pLeft) {
@@ -376,12 +390,28 @@ public class Raceing extends JFrame {
 
                 //player 2 movement
                 if (pW) {
-                    accelerating = true;
+                    isAccel2 = true;
+                    isDecel2 = false;
+                    // accelerating = true;
+                    // moveInDirection(rotationAngle2, true);
+                    // p2velocity = Math.min(p2velocity + accel, maxSpeed);
+                } else if (isAccel2) {
+                    isAccel2 = false;
+                    isDecel2 = true;
+                    // accelerating = false;
+                    // p2velocity = Math.max(p2velocity - decel, 0.0);
+                }
+                if (isAccel2) {
                     moveInDirection(rotationAngle2, true);
                     p2velocity = Math.min(p2velocity + accel, maxSpeed);
-                } else {
-                    accelerating = false;
-                    p2velocity = Math.max(p2velocity - decel, 0.0);
+                }
+                if (isDecel2) {
+                    p2velocity = Math.max(p2velocity - deceleration, 0.0);
+                    moveInDirection(rotationAngle2, true);
+
+                    if (p2velocity == 0.0) {
+                        isDecel2 = false;
+                    }
                 }
                 if (pS) {
                     double revDecel = -0.4;
@@ -432,6 +462,11 @@ public class Raceing extends JFrame {
         private static final double decel = 0.5;
         //private double currentSpeed = 0.0;
         private boolean accelerating = false;
+        private static final double deceleration = 0.08;
+        private boolean isAccel = false;
+        private boolean isDecel = false;
+        private boolean isAccel2 = false;
+        private boolean isDecel2 = false;
     }
 
     /*private static class ImageObject {
