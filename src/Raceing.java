@@ -135,11 +135,23 @@ public class Raceing extends JFrame {
         private double player2X;
         private double player2Y;
         private double player2Rotation;
+        private JLabel velLabel1;
+        private JLabel velLabel2;
         
         public MyPanel() {
             twisty_turn = new ImageIcon("twist_and_turn.png").getImage();
             carModel = loadAndResizeImage("car1.png", 70, 100);
             carModel2 = loadAndResizeImage("car2.png", 70, 100);
+
+            //velLabel1 = new JLabel("P1 Speed: 0");
+            //velLabel2 = new JLabel("P2 Speed: 0");
+            //Font labelFont = new Font("SansSerif Plain", Font.PLAIN, 18);
+            //velLabel1.setFont(labelFont);
+            //velLabel2.setFont(labelFont);
+            //velLabel1.setForeground(SEASHELL);
+            //velLabel2.setForeground(SEASHELL);
+            //add(velLabel1);
+            //add(velLabel2);
 
             player1X = p1originalX;
             player1Y = p1originalY;
@@ -195,6 +207,11 @@ public class Raceing extends JFrame {
 
                 g2d.drawImage(carModel2, (int) player2X, (int) player2Y, null);
             }
+                //velLabel1.setText("P1 Speed: " + Math.round(p1velocity));
+                //velLabel2.setText("P2 Speed: " + Math.round(p2velocity));
+
+                //velLabel1.setBounds(10, 10, 100, 20);
+                //velLabel2.setBounds(800, 10, 100, 20);
         }
 
         public void startRace() {
@@ -313,6 +330,7 @@ public class Raceing extends JFrame {
             velocityStep = 1.0;
             rotateStep = 0.0315;
             rotationAngle = 0.0;
+            rotationAngle2 = 0.0;
             p1velocity = 0.0;
             accelerating = false;
         }
@@ -324,6 +342,7 @@ public class Raceing extends JFrame {
                 catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //player 1 movement
                 if (pUp) {
                     accelerating = true;
                     p1velocity = Math.min(p1velocity + accel, maxSpeed);
@@ -334,8 +353,9 @@ public class Raceing extends JFrame {
                     p1velocity = Math.max(p1velocity - decel, 0.0);
                 }
                 if (pDown) {
+                    double revDecel = -0.4;
+                    p1velocity = Math.max(p1velocity - revDecel, 0.0);
                     moveInDirection(rotationAngle + pi, false);
-                    p1velocity = Math.max(p1velocity - decel, 0.0);
                 }
                 if (pLeft) {
                     accelerating = false;
@@ -351,25 +371,26 @@ public class Raceing extends JFrame {
                 //player 2 movement
                 if (pW) {
                     accelerating = true;
-                    moveInDirection(rotationAngle, true);
+                    moveInDirection(rotationAngle2, true);
                     p2velocity = Math.min(p2velocity + accel, maxSpeed);
                 } else {
                     accelerating = false;
                     p2velocity = Math.max(p2velocity - decel, 0.0);
                 }
                 if (pS) {
-                    moveInDirection(rotationAngle + pi, true);
-                    p2velocity = Math.max(p2velocity - decel, 0.0);
+                    double revDecel = -0.4;
+                    p2velocity = Math.max(p2velocity - revDecel, 0.0);
+                    moveInDirection(rotationAngle2 + pi, true);
                 }
                 if (pA) {
                     accelerating = false;
-                    rotationAngle -= rotateStep;
-                    panel.setPlayer2Rotation(rotationAngle);
+                    rotationAngle2 -= rotateStep;
+                    panel.setPlayer2Rotation(rotationAngle2);
                 }
                 if (pD) {
                     accelerating = false;
-                    rotationAngle += rotateStep;
-                    panel.setPlayer2Rotation(rotationAngle);
+                    rotationAngle2 += rotateStep;
+                    panel.setPlayer2Rotation(rotationAngle2);
                 }
             }
         }
@@ -395,6 +416,7 @@ public class Raceing extends JFrame {
         private double velocityStep;
         private double rotateStep;
         private double rotationAngle;
+        private double rotationAngle2;
         private final MyPanel panel;
         private static final double maxSpeed = 3.25;
         private static final double accel = 0.0725;
