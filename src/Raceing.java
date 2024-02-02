@@ -140,6 +140,7 @@ public class Raceing extends JFrame {
         
         public MyPanel() {
             twisty_turn = new ImageIcon("twist_and_turn.png").getImage();
+            BufferedImage bufferedTwisty = toBufferedImage(twisty_turn);
             carModel = loadAndResizeImage("car1.png", 50, 80);
             carModel2 = loadAndResizeImage("car2.png", 50, 80);
 
@@ -288,6 +289,30 @@ public class Raceing extends JFrame {
         public void setPlayer2Rotation(double angle) {
             player2Rotation = angle;
             repaint();
+        }
+
+        private Color getBackgroundColor(int x, int y) {
+            BufferedImage newMap = toBufferedImage(twisty_turn);
+            int rgb = newMap.getRGB(x, y);
+            return new Color(rgb, true);
+        }
+
+        private BufferedImage toBufferedImage(Image image) {
+            if (image instanceof BufferedImage) {
+                return (BufferedImage) image;
+            }
+        
+            BufferedImage bufferedImage = new BufferedImage(
+                    image.getWidth(null),
+                    image.getHeight(null),
+                    BufferedImage.TYPE_INT_ARGB
+            );
+        
+            Graphics2D g = bufferedImage.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+        
+            return bufferedImage;
         }
     }
 
@@ -439,6 +464,14 @@ public class Raceing extends JFrame {
             double newX = isPlayer2 ? panel.player2X : panel.player1X;
             double newY = isPlayer2 ? panel.player2Y : panel.player1Y;
 
+            int pixelX = (int) newX;
+            int pixelY = (int) newY;
+            Color backgroundColor = panel.getBackgroundColor(pixelX, pixelY);
+
+            // if (isSlowTerrain(backgroundColor)) {
+            //     velocity *= 0.2;  // Adjust this factor according to your preference
+            // }
+
             newX += velocity * Math.cos(adjustedAngle);
             newY += velocity * Math.sin(adjustedAngle);
 
@@ -451,6 +484,12 @@ public class Raceing extends JFrame {
                 panel.setPlayerPosition(newX, newY);
             }
         }
+
+        // private boolean isSlowTerrain(Color color) {
+        //     // Check if the color represents the slow terrain (dirt or grass)
+        //     // Adjust the conditions based on the specific color values in your background image
+        //     return color.equals(Color.GREEN) || color.equals(Color.BROWN);
+        // }
 
         private double velocityStep;
         private double rotateStep;
