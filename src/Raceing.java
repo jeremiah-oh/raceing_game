@@ -140,8 +140,8 @@ public class Raceing extends JFrame {
         
         public MyPanel() {
             twisty_turn = new ImageIcon("twist_and_turn.png").getImage();
-            carModel = loadAndResizeImage("car1.png", 70, 100);
-            carModel2 = loadAndResizeImage("car2.png", 70, 100);
+            carModel = loadAndResizeImage("car1.png", 50, 80);
+            carModel2 = loadAndResizeImage("car2.png", 50, 80);
 
             //velLabel1 = new JLabel("P1 Speed: 0");
             //velLabel2 = new JLabel("P2 Speed: 0");
@@ -334,7 +334,7 @@ public class Raceing extends JFrame {
         public PlayerMover(MyPanel panel) {
             this.panel = panel;
             velocityStep = 1.0;
-            rotateStep = 0.0315;
+            rotateStep = 0.045;
             rotationAngle = 0.0;
             rotationAngle2 = 0.0;
             p1velocity = 0.0;
