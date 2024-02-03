@@ -24,6 +24,8 @@ import javax.swing.border.LineBorder;
 
 public class Raceing extends JFrame {
     private static StartScreen startScreen;
+    private static Image twisty_turn_main;
+    private static Image twisty_turn_outline;
 
     public Raceing() {
         setup();
@@ -126,7 +128,6 @@ public class Raceing extends JFrame {
 
     private static class MyPanel extends JPanel implements KeyListener {
         private boolean startRace = false;
-        private Image twisty_turn;
         private Image carModel;
         private Image carModel2;
         private double player1X;
@@ -139,8 +140,9 @@ public class Raceing extends JFrame {
         private JLabel velLabel2;
         
         public MyPanel() {
-            twisty_turn = new ImageIcon("twist_and_turn.png").getImage();
-            BufferedImage bufferedTwisty = toBufferedImage(twisty_turn);
+            twisty_turn_main = new ImageIcon("twist_and_turn_maintrack.png").getImage();
+            twisty_turn_outline = new ImageIcon("twist_and_turn_outline.png").getImage();
+
             carModel = loadAndResizeImage("car1.png", 50, 80);
             carModel2 = loadAndResizeImage("car2.png", 50, 80);
 
@@ -190,11 +192,17 @@ public class Raceing extends JFrame {
             super.paintComponent(g);
             if (startRace) {
                 Graphics2D g2d = (Graphics2D) g;
-                double scaleX = (double) getWidth() / twisty_turn.getWidth(null);
-                double scaleY = (double) getHeight() / twisty_turn.getHeight(null);
+                double scaleX = (double) getWidth() / twisty_turn_main.getWidth(null);
+                double scaleY = (double) getHeight() / twisty_turn_main.getHeight(null);
+
+                double scaleX1 = (double) getWidth() / twisty_turn_outline.getWidth(null);
+                double scaleY1 = (double) getHeight() / twisty_turn_outline.getHeight(null);
 
                 AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
-                g2d.drawImage(twisty_turn, scaleTransform, this);
+                g2d.drawImage(twisty_turn_main, scaleTransform, this);
+
+                AffineTransform scaleTransform1 = AffineTransform.getScaleInstance(scaleX1, scaleY1);
+                g2d.drawImage(twisty_turn_outline, scaleTransform1, this);
 
                 AffineTransform rotationTransform = AffineTransform.getRotateInstance(playerRotation,
                         player1X + carModel.getWidth(null) / 2, player1Y + carModel.getHeight(null) / 2);
@@ -292,26 +300,34 @@ public class Raceing extends JFrame {
         }
 
         private Color getBackgroundColor(int x, int y) {
-            BufferedImage newMap = toBufferedImage(twisty_turn);
+            BufferedImage newMap = toBufferedImage(twisty_turn_main);
+            BufferedImage newMap2 = toBufferedImage(twisty_turn_outline);
             int rgb = newMap.getRGB(x, y);
+            int rgb1 = newMap2.getRGB(x, y);
             return new Color(rgb, true);
         }
 
-        private BufferedImage toBufferedImage(Image image) {
+        private static BufferedImage toBufferedImage(Image image) {
+            if (image == null) {
+                // Handle the case when the image is not loaded properly
+                System.err.println("Error: Unable to load image");
+                return null;
+            }
+    
             if (image instanceof BufferedImage) {
                 return (BufferedImage) image;
             }
-        
+    
             BufferedImage bufferedImage = new BufferedImage(
                     image.getWidth(null),
                     image.getHeight(null),
                     BufferedImage.TYPE_INT_ARGB
             );
-        
+    
             Graphics2D g = bufferedImage.createGraphics();
             g.drawImage(image, 0, 0, null);
             g.dispose();
-        
+    
             return bufferedImage;
         }
     }
@@ -463,32 +479,74 @@ public class Raceing extends JFrame {
             double newX = isPlayer2 ? panel.player2X : panel.player1X;
             double newY = isPlayer2 ? panel.player2Y : panel.player1Y;
 
-            int pixelX = (int) newX;
-            int pixelY = (int) newY;
-            Color backgroundColor = panel.getBackgroundColor(pixelX, pixelY);
-
-            // if (isSlowTerrain(backgroundColor)) {
-            //     velocity *= 0.2;  // Adjust this factor according to your preference
-            // }
-
             newX += velocity * Math.cos(adjustedAngle);
             newY += velocity * Math.sin(adjustedAngle);
 
             newX = Math.max(XOFFSET, Math.min(newX, XOFFSET + WINWIDTH - 70));
             newY = Math.max(YOFFSET, Math.min(newY, YOFFSET + WINHEIGHT - 100));
 
+            int pixelX = (int) newX;
+            int pixelY = (int) newY;
+            // BufferedImage terrain = toBufferedImage(twisty_turn);
+
+            // if (isSlowTerrain(terrain, newX, newY)) {
+            //     velocity *= 0.9;
+            // }
+
             if (isPlayer2) {
                 panel.setPlayer2Position(newX, newY);
+                p2velocity = velocity;
             } else {
-                panel.setPlayerPosition(newX, newY);
+                panel.setPlayerPosition(newX, newY); 
+                p1velocity = velocity;
             }
         }
 
-        // private boolean isSlowTerrain(Color color) {
-        //     // Check if the color represents the slow terrain (dirt or grass)
-        //     // Adjust the conditions based on the specific color values in your background image
-        //     return color.equals(Color.GREEN) || color.equals(Color.BROWN);
-        // }
+        private boolean isSlowTerrain(BufferedImage terrain, double x, double y) {
+            int pixelX = (int) Math.round(x);
+            int pixelY = (int) Math.round(y);
+            
+            if (pixelX < 0 || pixelY < 0 || pixelX >= terrain.getWidth() || pixelY >= terrain.getHeight()) {
+                // Make sure the indices are within valid bounds
+                return false;
+            }
+        
+            int pixelColor = terrain.getRGB(pixelX, pixelY);
+            Color color = new Color(pixelColor);
+
+            int grayscaleValue = (int) (color.getRed() * 0.299 + color.getGreen() * 0.587 + color.getBlue() * 0.114);
+
+            // Define a threshold range for grayscale values corresponding to the main track
+            int trackMinGrayscale = 100;  // Adjust this value based on your needs
+            int trackMaxGrayscale = 200;  // Adjust this value based on your needs
+
+            // Check if the grayscale value is not within the main track range
+            return (grayscaleValue < trackMinGrayscale || grayscaleValue > trackMaxGrayscale);
+        }
+
+        private static BufferedImage toBufferedImage(Image image) {
+            if (image == null) {
+                // Handle the case when the image is not loaded properly
+                System.err.println("Error: Unable to load image");
+                return null;
+            }
+    
+            if (image instanceof BufferedImage) {
+                return (BufferedImage) image;
+            }
+    
+            BufferedImage bufferedImage = new BufferedImage(
+                    image.getWidth(null),
+                    image.getHeight(null),
+                    BufferedImage.TYPE_INT_ARGB
+            );
+    
+            Graphics2D g = bufferedImage.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+    
+            return bufferedImage;
+        }
 
         private double velocityStep;
         private double rotateStep;
@@ -498,7 +556,6 @@ public class Raceing extends JFrame {
         private static final double maxSpeed = 3.25;
         private static final double accel = 0.0725;
         private static final double decel = 0.5;
-        //private double currentSpeed = 0.0;
         private boolean accelerating = false;
         private static final double deceleration = 0.08;
         private boolean isAccel = false;
