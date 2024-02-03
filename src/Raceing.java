@@ -439,8 +439,7 @@ public class Raceing extends JFrame {
                     }
                 }
                 if (pS) {
-                    double revDecel = -0.4;
-                    p2velocity = Math.max(p2velocity - revDecel, 0.0);
+                    p2velocity = Math.max(p2velocity - decel, 0.0);
                     moveInDirection(rotationAngle2 + pi, true);
                 }
                 if (pA) {
