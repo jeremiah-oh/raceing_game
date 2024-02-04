@@ -26,6 +26,8 @@ public class Raceing extends JFrame {
     private static StartScreen startScreen;
     private static Image twisty_turn_main;
     private static Image twisty_turn_outline;
+    private static Image finish_line;
+    private static Image tire;
 
     public Raceing() {
         setup();
@@ -44,13 +46,13 @@ public class Raceing extends JFrame {
         //player 1 values
         p1width = 25;
         p1height = 25;
-        p1originalX = (double)XOFFSET + ((double)WINWIDTH /  2.0) - (p1width / 2.0);
-        p1originalY = (double)YOFFSET + ((double)WINHEIGHT / 2.0) - (p1height / 2.0);
+        p1originalX = (double)XOFFSET + (((double)WINWIDTH) / 3) + (p1width * 22);
+        p1originalY = (double)YOFFSET + (((double)WINHEIGHT) / 3) + (p1height * 12.5);
         //player 2 values
         p2width = 25;
         p2height = 25;
-        p2originalX = (double)XOFFSET + ((double)WINWIDTH /  2.0) - (p2width / 2.0);
-        p2originalY = (double)YOFFSET + ((double)WINHEIGHT / 2.0) - (p2height / 2.0);
+        p2originalX = (double)XOFFSET + (((double)WINWIDTH) /  3) + (p2width * 20.5);
+        p2originalY = (double)YOFFSET + (((double)WINHEIGHT) / 3) + (p2height * 12.5);
 
         gamePanel = new MyPanel();
 
@@ -136,25 +138,17 @@ public class Raceing extends JFrame {
         private double player2X;
         private double player2Y;
         private double player2Rotation;
-        private JLabel velLabel1;
-        private JLabel velLabel2;
+        private int p1Laps = 0;
+        private int p2Laps = 0;
+        private boolean player1OnFinish, player2OnFinish;
         
         public MyPanel() {
             twisty_turn_main = new ImageIcon("twist_and_turn_maintrack.png").getImage();
             twisty_turn_outline = new ImageIcon("twist_and_turn_outline.png").getImage();
-
+            finish_line = loadAndResizeImage("finish_line.png", 59, 59);
             carModel = loadAndResizeImage("car1.png", 50, 80);
             carModel2 = loadAndResizeImage("car2.png", 50, 80);
-
-            //velLabel1 = new JLabel("P1 Speed: 0");
-            //velLabel2 = new JLabel("P2 Speed: 0");
-            //Font labelFont = new Font("SansSerif Plain", Font.PLAIN, 18);
-            //velLabel1.setFont(labelFont);
-            //velLabel2.setFont(labelFont);
-            //velLabel1.setForeground(SEASHELL);
-            //velLabel2.setForeground(SEASHELL);
-            //add(velLabel1);
-            //add(velLabel2);
+            tire = loadAndResizeImage("tire.png", 40, 40);
 
             player1X = p1originalX;
             player1Y = p1originalY;
@@ -169,21 +163,6 @@ public class Raceing extends JFrame {
             addKeyListener(this);
             pUp = false;
             pW = false;
-        }
-
-        //method for resizing car model
-        private Image loadAndResizeImage(String filePath, int width, int height) {
-            try {
-                BufferedImage originalImage = ImageIO.read(new File(filePath));
-                BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D g = resizedImage.createGraphics();
-                g.drawImage(originalImage, 0, 0, width, height, null);
-                g.dispose();
-                return resizedImage;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
         }
 
         //drawing everything onto the main screen
@@ -204,6 +183,22 @@ public class Raceing extends JFrame {
                 AffineTransform scaleTransform1 = AffineTransform.getScaleInstance(scaleX1, scaleY1);
                 g2d.drawImage(twisty_turn_outline, scaleTransform1, this);
 
+                Font font = new Font("SansSerif Plain", Font.PLAIN, 12);
+                g2d.setFont(font);
+                g2d.setColor(SEASHELL);
+                g2d.drawString("P1 Speed: " + Math.round(p1velocity) * 60, 5, 20);
+                g2d.drawString("P2 Speed: " + Math.round(p2velocity) * 60, 895, 20);
+
+                Font font2 = new Font("SansSerif Plain", Font.PLAIN, 12);
+                g2d.setFont(font2);
+                g2d.setColor(SEASHELL);
+                g2d.drawString("P1 Laps: " + p1Laps + " / 3", 5, 35);
+                g2d.drawString("P2 Laps: " + p2Laps + " / 3", 895, 35);
+
+                int finishX = 860;
+                int finishY = 550;
+                g2d.drawImage(finish_line, finishX, finishY, null);
+
                 AffineTransform rotationTransform = AffineTransform.getRotateInstance(playerRotation,
                         player1X + carModel.getWidth(null) / 2, player1Y + carModel.getHeight(null) / 2);
                 g2d.setTransform(rotationTransform);
@@ -215,12 +210,27 @@ public class Raceing extends JFrame {
                 g2d.setTransform(rotationTransform2);
 
                 g2d.drawImage(carModel2, (int) player2X, (int) player2Y, null);
-            }
-                //velLabel1.setText("P1 Speed: " + Math.round(p1velocity));
-                //velLabel2.setText("P2 Speed: " + Math.round(p2velocity));
 
-                //velLabel1.setBounds(10, 10, 100, 20);
-                //velLabel2.setBounds(800, 10, 100, 20);
+                g2d.drawImage(tire, 400, 500, null);
+                g2d.drawImage(tire, 340, 440, null);
+                g2d.drawImage(tire, 290, 510, null);
+                g2d.drawImage(tire, 250, 410, null);
+            }
+        }
+
+        //method for resizing car model
+        private Image loadAndResizeImage(String filePath, int width, int height) {
+            try {
+                BufferedImage originalImage = ImageIO.read(new File(filePath));
+                BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = resizedImage.createGraphics();
+                g.drawImage(originalImage, 0, 0, width, height, null);
+                g.dispose();
+                return resizedImage;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         public void startRace() {
@@ -234,6 +244,7 @@ public class Raceing extends JFrame {
 
             player1X = x;
             player1Y = y;
+            //checkLapFinish();
             repaint();
         }
 
@@ -243,6 +254,7 @@ public class Raceing extends JFrame {
 
             player2X = x;
             player2Y = y;
+            //checkLapFinish();
             repaint();
         }
 
@@ -330,6 +342,55 @@ public class Raceing extends JFrame {
     
             return bufferedImage;
         }
+
+        private void checkLapFinish() {
+            if (isTouchingFinish(player1X, player1Y)) {
+                if (!player1OnFinish) {
+                    player1OnFinish = true;
+                    p1Laps++;
+                    updateLapCounter();
+                }
+            } else {
+                player1OnFinish = false;
+            }
+        
+            if (isTouchingFinish(player2X, player2Y)) {
+                if (!player2OnFinish) {
+                    player2OnFinish = true;
+                    p2Laps++;
+                    updateLapCounter();
+                }
+            } else {
+                player2OnFinish = false;
+            }
+        }
+
+        private boolean isTouchingFinish(double x, double y) {
+            int pixelX = (int) Math.round(x);
+            int pixelY = (int) Math.round(y);
+            Color pixelColor = getBackgroundColor(pixelX, pixelY);
+        
+            int finishLineRed = 255;
+            int finishLineGreen = 255;
+            int finishLineBlue = 255;
+        
+            int colorTolerance = 30;
+        
+            return Math.abs(pixelColor.getRed() - finishLineRed) < colorTolerance
+                && Math.abs(pixelColor.getGreen() - finishLineGreen) < colorTolerance
+                && Math.abs(pixelColor.getBlue() - finishLineBlue) < colorTolerance;
+        }
+
+        private void updateLapCounter() {
+            if (p1Laps >= 3 || p2Laps >= 3) {
+                endgame = true;
+                System.exit(0);
+            }
+            
+            SwingUtilities.invokeLater(() -> {
+                repaint();
+            });
+        }
     }
 
     private static class StartGame implements ActionListener {
@@ -352,6 +413,7 @@ public class Raceing extends JFrame {
             appFrame.repaint();
 
             panel.setPlayerPosition(p1originalX, p1originalY);
+            panel.setPlayer2Position(p2originalX, p2originalY);
             panel.startRace();
 
             startBut.setVisible(false);
@@ -361,6 +423,8 @@ public class Raceing extends JFrame {
 
             PlayerMover playerMover = new PlayerMover(panel);
             new Thread(playerMover).start();
+
+            panel.repaint();
         }
     }
 
@@ -374,8 +438,8 @@ public class Raceing extends JFrame {
     private static class PlayerMover implements Runnable {
         public PlayerMover(MyPanel panel) {
             this.panel = panel;
-            velocityStep = 1.0;
             rotateStep = 0.045; 
+            rotateStep2 = 0.045;
             rotationAngle = 0.0;
             rotationAngle2 = 0.0;
             p1velocity = 0.0;
@@ -393,14 +457,9 @@ public class Raceing extends JFrame {
                 if (pUp) {
                     isAccel = true;
                     isDecel = false;
-                    // accelerating = true;
-                    // p1velocity = Math.min(p1velocity + accel, maxSpeed);
-                    // moveInDirection(rotationAngle, false);
                 } else if (isAccel) {
                     isAccel = false;
                     isDecel = true;
-                    // accelerating = false;
-                    // p1velocity = Math.max(p1velocity - decel, 0.0);
                 }
                 if (isAccel) {
                     p1velocity = Math.min(p1velocity + accel, maxSpeed);
@@ -433,21 +492,16 @@ public class Raceing extends JFrame {
                 if (pW) {
                     isAccel2 = true;
                     isDecel2 = false;
-                    // accelerating = true;
-                    // moveInDirection(rotationAngle2, true);
-                    // p2velocity = Math.min(p2velocity + accel, maxSpeed);
                 } else if (isAccel2) {
                     isAccel2 = false;
                     isDecel2 = true;
-                    // accelerating = false;
-                    // p2velocity = Math.max(p2velocity - decel, 0.0);
                 }
                 if (isAccel2) {
                     moveInDirection(rotationAngle2, true);
-                    p2velocity = Math.min(p2velocity + accel, maxSpeed);
+                    p2velocity = Math.min(p2velocity + accel2, maxSpeed);
                 }
                 if (isDecel2) {
-                    p2velocity = Math.max(p2velocity - deceleration, 0.0);
+                    p2velocity = Math.max(p2velocity - deceleration2, 0.0);
                     moveInDirection(rotationAngle2, true);
 
                     if (p2velocity == 0.0) {
@@ -455,19 +509,23 @@ public class Raceing extends JFrame {
                     }
                 }
                 if (pS) {
-                    p2velocity = Math.max(p2velocity - decel, 0.0);
+                    p2velocity = Math.max(p2velocity - decel2, 0.0);
                     moveInDirection(rotationAngle2 + pi, true);
                 }
                 if (pA) {
                     accelerating = false;
-                    rotationAngle2 -= rotateStep;
+                    rotationAngle2 -= rotateStep2;
                     panel.setPlayer2Rotation(rotationAngle2);
                 }
                 if (pD) {
                     accelerating = false;
-                    rotationAngle2 += rotateStep;
+                    rotationAngle2 += rotateStep2;
                     panel.setPlayer2Rotation(rotationAngle2);
                 }
+
+                SwingUtilities.invokeLater(() -> {
+                    panel.repaint();
+                });
             }
         }
 
@@ -487,10 +545,10 @@ public class Raceing extends JFrame {
 
             int pixelX = (int) newX;
             int pixelY = (int) newY;
-            // BufferedImage terrain = toBufferedImage(twisty_turn);
+            BufferedImage terrain = toBufferedImage(twisty_turn_outline);
 
             // if (isSlowTerrain(terrain, newX, newY)) {
-            //     velocity *= 0.9;
+            //      velocity *= 0.95;
             // }
 
             if (isPlayer2) {
@@ -505,23 +563,22 @@ public class Raceing extends JFrame {
         private boolean isSlowTerrain(BufferedImage terrain, double x, double y) {
             int pixelX = (int) Math.round(x);
             int pixelY = (int) Math.round(y);
-            
-            if (pixelX < 0 || pixelY < 0 || pixelX >= terrain.getWidth() || pixelY >= terrain.getHeight()) {
+
+            if (pixelX < 0 || pixelY < 0 || pixelX >= twisty_turn_outline.getWidth(null) 
+                || pixelY >= twisty_turn_outline.getHeight(null)) {
                 // Make sure the indices are within valid bounds
                 return false;
             }
-        
-            int pixelColor = terrain.getRGB(pixelX, pixelY);
-            Color color = new Color(pixelColor);
 
-            int grayscaleValue = (int) (color.getRed() * 0.299 + color.getGreen() * 0.587 + color.getBlue() * 0.114);
+            terrain = toBufferedImage(twisty_turn_outline);
+            // Get the alpha value of the pixel
+            int alpha = (terrain.getRGB(pixelX, pixelY) >> 24) & 0xFF;
 
-            // Define a threshold range for grayscale values corresponding to the main track
-            int trackMinGrayscale = 100;  // Adjust this value based on your needs
-            int trackMaxGrayscale = 200;  // Adjust this value based on your needs
+            // Adjust the threshold based on your needs
+            int alphaThreshold = 260;
 
-            // Check if the grayscale value is not within the main track range
-            return (grayscaleValue < trackMinGrayscale || grayscaleValue > trackMaxGrayscale);
+            // If the alpha value is above the threshold, consider it part of the outline
+            return alpha > alphaThreshold;
         }
 
         private static BufferedImage toBufferedImage(Image image) {
@@ -548,20 +605,18 @@ public class Raceing extends JFrame {
             return bufferedImage;
         }
 
-        private double velocityStep;
-        private double rotateStep;
-        private double rotationAngle;
-        private double rotationAngle2;
+        //private double velocityStep;
+        private double rotateStep, rotateStep2, rotationAngle, rotationAngle2;
         private final MyPanel panel;
-        private static final double maxSpeed = 3.25;
-        private static final double accel = 0.0725;
+        private static final double maxSpeed = 3.0;
+        private static final double accel = 0.05;
+        private static final double accel2 = 0.05;
         private static final double decel = 0.5;
+        private static final double decel2 = 0.5;
         private boolean accelerating = false;
-        private static final double deceleration = 0.08;
-        private boolean isAccel = false;
-        private boolean isDecel = false;
-        private boolean isAccel2 = false;
-        private boolean isDecel2 = false;
+        private static final double deceleration = 0.045;
+        private static final double deceleration2 = 0.045;
+        private boolean isAccel, isDecel, isAccel2, isDecel2 = false;
     }
 
     /*private static class ImageObject {
@@ -648,17 +703,9 @@ public class Raceing extends JFrame {
     private static Boolean endgame;
 
     //private static ImageObject p1 ;
-    private static double p1width ;
-    private static double p1height ;
-    private static double p1originalX ;
-    private static double p1originalY ;
-    private static double p1velocity ;
+    private static double p1width, p1height, p1originalX, p1originalY, p1velocity;
 
-    private static double p2width;
-    private static double p2height;
-    private static double p2originalX;
-    private static double p2originalY;
-    private static double p2velocity;
+    private static double p2width, p2height, p2originalX, p2originalY, p2velocity;
 
     private static int XOFFSET, YOFFSET, WINWIDTH, WINHEIGHT;
 
